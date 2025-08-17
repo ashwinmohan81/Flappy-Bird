@@ -3,12 +3,10 @@ import './App.css';
 
 const BIRD_HEIGHT = 28;
 const BIRD_WIDTH = 38;
-const GAME_HEIGHT = 500;
-const GAME_WIDTH = 500;
-const GRAVITY = 0.5;
-const JUMP_SPEED = -8;
 const PIPE_WIDTH = 52;
 const PIPE_GAP = 150;
+const GRAVITY = 0.5;
+const JUMP_SPEED = -8;
 
 function App() {
   const [birdPosition, setBirdPosition] = useState(250);
@@ -18,6 +16,23 @@ function App() {
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [clouds, setClouds] = useState([]);
+  const [gameDimensions, setGameDimensions] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  });
+
+  // Update game dimensions when window resizes
+  useEffect(() => {
+    const handleResize = () => {
+      setGameDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const jump = useCallback(() => {
     if (!gameStarted) {
@@ -29,7 +44,7 @@ function App() {
   }, [gameStarted, gameOver]);
 
   const resetGame = () => {
-    setBirdPosition(250);
+    setBirdPosition(gameDimensions.height / 2);
     setGameStarted(false);
     setVelocity(0);
     setPipes([]);
@@ -56,7 +71,7 @@ function App() {
     const gameLoop = setInterval(() => {
       setBirdPosition((prev) => {
         const newPosition = prev + velocity;
-        if (newPosition < 0 || newPosition > GAME_HEIGHT - BIRD_HEIGHT) {
+        if (newPosition < 0 || newPosition > gameDimensions.height - BIRD_HEIGHT) {
           setGameOver(true);
           return prev;
         }
@@ -73,10 +88,10 @@ function App() {
           }))
           .filter((pipe) => pipe.x > -PIPE_WIDTH);
 
-        if (prevPipes.length === 0 || prevPipes[prevPipes.length - 1].x < GAME_WIDTH - 200) {
-          const pipeHeight = Math.random() * (GAME_HEIGHT - PIPE_GAP - 100) + 50;
+        if (prevPipes.length === 0 || prevPipes[prevPipes.length - 1].x < gameDimensions.width - 200) {
+          const pipeHeight = Math.random() * (gameDimensions.height - PIPE_GAP - 100) + 50;
           newPipes.push({
-            x: GAME_WIDTH,
+            x: gameDimensions.width,
             height: pipeHeight,
             passed: false,
           });
@@ -94,12 +109,12 @@ function App() {
           }))
           .filter((cloud) => cloud.x > -100);
 
-        if (prevClouds.length === 0 || Math.random() < 0.02) {
-          const cloudY = Math.random() * (GAME_HEIGHT - 100) + 50;
+        if (prevClouds.length === 0 || Math.random() < 0.008) {
+          const cloudY = Math.random() * (gameDimensions.height - 100) + 50;
           const cloudSize = Math.random() * 40 + 60;
           const cloudSpeed = Math.random() * 0.5 + 0.5;
           newClouds.push({
-            x: GAME_WIDTH + 50,
+            x: gameDimensions.width + 50,
             y: cloudY,
             size: cloudSize,
             speed: cloudSpeed,
@@ -112,7 +127,7 @@ function App() {
     }, 20);
 
     return () => clearInterval(gameLoop);
-  }, [gameStarted, velocity]);
+  }, [gameStarted, velocity, gameDimensions]);
 
   useEffect(() => {
     if (!gameStarted) return;
@@ -149,7 +164,10 @@ function App() {
         <div 
           className="game-area" 
           onClick={jump}
-          style={{ width: GAME_WIDTH, height: GAME_HEIGHT }}
+          style={{ 
+            width: gameDimensions.width, 
+            height: gameDimensions.height - 100 
+          }}
         >
           {/* Clouds in background */}
           {clouds.map((cloud, index) => (
@@ -196,7 +214,7 @@ function App() {
                   left: pipe.x,
                   top: pipe.height + PIPE_GAP,
                   width: PIPE_WIDTH,
-                  height: GAME_HEIGHT - pipe.height - PIPE_GAP,
+                  height: gameDimensions.height - pipe.height - PIPE_GAP - 100,
                 }}
               />
             </React.Fragment>

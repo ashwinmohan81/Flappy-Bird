@@ -2,47 +2,61 @@
   text-align: center;
   background: linear-gradient(to bottom, #87CEEB, #98FB98);
   min-height: 100vh;
-  padding: 20px;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
   font-family: 'Arial', sans-serif;
+  overflow: hidden;
 }
 
 .game-container {
-  max-width: 600px;
-  margin: 0 auto;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
   background: white;
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   overflow: hidden;
+  position: relative;
 }
 
 .game-header {
   background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
   color: white;
-  padding: 20px;
+  padding: 15px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .game-header h1 {
   margin: 0;
-  font-size: 2.5rem;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .score {
-  font-size: 1.5rem;
+  font-size: clamp(1rem, 3vw, 1.5rem);
   font-weight: bold;
   background: rgba(255, 255, 255, 0.2);
-  padding: 10px 20px;
+  padding: 8px 16px;
   border-radius: 25px;
   backdrop-filter: blur(10px);
 }
 
 .game-area {
-  position: relative;
+  position: absolute;
+  top: 70px;
+  left: 0;
+  right: 0;
+  bottom: 80px;
   background: linear-gradient(to bottom, #87CEEB, #98FB98);
-  border: 3px solid #2c3e50;
+  border: none;
   cursor: pointer;
   overflow: hidden;
   perspective: 1200px;
@@ -259,77 +273,113 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.9);
   color: white;
-  padding: 30px;
-  border-radius: 15px;
+  padding: 40px;
+  border-radius: 20px;
   text-align: center;
-  backdrop-filter: blur(10px);
-  z-index: 20;
+  backdrop-filter: blur(15px);
+  z-index: 200;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  min-width: 300px;
 }
 
 .game-over h2, .start-screen h2 {
-  margin: 0 0 20px 0;
+  margin: 0 0 25px 0;
   color: #FF6B6B;
-  font-size: 2rem;
+  font-size: clamp(1.8rem, 5vw, 2.5rem);
 }
 
 .game-over p {
-  margin: 15px 0;
-  font-size: 1.2rem;
+  margin: 20px 0;
+  font-size: clamp(1.1rem, 3vw, 1.3rem);
 }
 
 .game-over button {
   background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
   color: white;
   border: none;
-  padding: 15px 30px;
-  font-size: 1.1rem;
-  border-radius: 25px;
+  padding: 18px 36px;
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  border-radius: 30px;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  margin-top: 15px;
+  transition: all 0.3s ease;
+  margin-top: 20px;
+  font-weight: bold;
 }
 
 .game-over button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
 }
 
 .instructions {
   background: #f8f9fa;
-  padding: 20px;
+  padding: 15px 20px;
   border-top: 1px solid #dee2e6;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .instructions p {
-  margin: 8px 0;
+  margin: 5px 0;
   color: #6c757d;
-  font-size: 0.9rem;
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
 }
 
-/* Responsive design */
-@media (max-width: 600px) {
-  .game-container {
-    margin: 10px;
-    border-radius: 10px;
-  }
-  
+/* Full-screen responsive design */
+@media (max-width: 768px) {
   .game-header {
-    padding: 15px;
-  }
-  
-  .game-header h1 {
-    font-size: 2rem;
-  }
-  
-  .score {
-    font-size: 1.2rem;
-    padding: 8px 16px;
+    padding: 10px 15px;
   }
   
   .game-area {
-    width: 100% !important;
-    height: 400px !important;
+    top: 60px;
+    bottom: 70px;
+  }
+  
+  .instructions {
+    padding: 10px 15px;
+  }
+}
+
+@media (max-height: 600px) {
+  .game-header {
+    padding: 8px 15px;
+  }
+  
+  .game-area {
+    top: 50px;
+    bottom: 60px;
+  }
+  
+  .instructions {
+    padding: 8px 15px;
+  }
+  
+  .game-over, .start-screen {
+    padding: 25px;
+    min-width: 250px;
+  }
+}
+
+/* Landscape orientation optimization */
+@media (orientation: landscape) and (max-height: 500px) {
+  .game-header h1 {
+    font-size: 1.2rem;
+  }
+  
+  .score {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+  }
+  
+  .game-over, .start-screen {
+    padding: 20px;
+    min-width: 200px;
   }
 }
