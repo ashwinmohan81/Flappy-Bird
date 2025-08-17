@@ -7,6 +7,9 @@ const PIPE_WIDTH = 52;
 const PIPE_GAP = 150;
 const GRAVITY = 0.5;
 const JUMP_SPEED = -8;
+const INITIAL_PIPE_SPEED = 2;
+const MAX_PIPE_SPEED = 6;
+const DIFFICULTY_INCREASE_INTERVAL = 10000; // 10 seconds
 
 function App() {
   const [birdPosition, setBirdPosition] = useState(250);
@@ -16,10 +19,48 @@ function App() {
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [clouds, setClouds] = useState([]);
+  const [lives, setLives] = useState(3);
+  const [currentLevel, setCurrentLevel] = useState(1);
+  const [pipeSpeed, setPipeSpeed] = useState(INITIAL_PIPE_SPEED);
   const [gameDimensions, setGameDimensions] = useState({
     width: window.innerWidth,
     height: window.innerHeight
   });
+  const [musicPlaying, setMusicPlaying] = useState(false);
+  const [volume, setVolume] = useState(0.5);
+
+  // Audio setup
+  useEffect(() => {
+    const audio = new Audio('/8-bit-dreamland.mp3');
+    audio.loop = true;
+    audio.volume = volume;
+    
+    if (musicPlaying) {
+      audio.play().catch(e => console.log('Audio play failed:', e));
+    }
+
+    return () => {
+      audio.pause();
+      audio.currentTime = 0;
+    };
+  }, [musicPlaying, volume]);
+
+  // Sound effects
+  const playJumpSound = () => {
+    if (volume > 0) {
+      const jumpAudio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT');
+      jumpAudio.volume = volume * 0.7;
+      jumpAudio.play().catch(e => console.log('Jump sound failed:', e));
+    }
+  };
+
+  const playScoreSound = () => {
+    if (volume > 0) {
+      const scoreAudio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT');
+      scoreAudio.volume = volume * 0.6;
+      scoreAudio.play().catch(e => console.log('Score sound failed:', e));
+    }
+  };
 
   // Update game dimensions when window resizes
   useEffect(() => {
@@ -34,12 +75,25 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Progressive difficulty system
+  useEffect(() => {
+    if (!gameStarted || gameOver) return;
+
+    const difficultyTimer = setInterval(() => {
+      setCurrentLevel(prev => prev + 1);
+      setPipeSpeed(prev => Math.min(prev + 0.5, MAX_PIPE_SPEED));
+    }, DIFFICULTY_INCREASE_INTERVAL);
+
+    return () => clearInterval(difficultyTimer);
+  }, [gameStarted, gameOver]);
+
   const jump = useCallback(() => {
     if (!gameStarted) {
       setGameStarted(true);
     }
     if (!gameOver) {
       setVelocity(JUMP_SPEED);
+      playJumpSound();
     }
   }, [gameStarted, gameOver]);
 
@@ -51,6 +105,25 @@ function App() {
     setScore(0);
     setGameOver(false);
     setClouds([]);
+    setLives(3);
+    setCurrentLevel(1);
+    setPipeSpeed(INITIAL_PIPE_SPEED);
+  };
+
+  const loseLife = () => {
+    setLives(prev => {
+      const newLives = prev - 1;
+      if (newLives <= 0) {
+        setGameOver(true);
+        return 0;
+      }
+      // Reset bird position but keep score and continue
+      setBirdPosition(gameDimensions.height / 2);
+      setVelocity(0);
+      setPipes([]);
+      setClouds([]);
+      return newLives;
+    });
   };
 
   useEffect(() => {
@@ -72,7 +145,7 @@ function App() {
       setBirdPosition((prev) => {
         const newPosition = prev + velocity;
         if (newPosition < 0 || newPosition > gameDimensions.height - BIRD_HEIGHT) {
-          setGameOver(true);
+          loseLife();
           return prev;
         }
         return newPosition;
@@ -84,7 +157,7 @@ function App() {
         const newPipes = prevPipes
           .map((pipe) => ({
             ...pipe,
-            x: pipe.x - 2,
+            x: pipe.x - pipeSpeed,
           }))
           .filter((pipe) => pipe.x > -PIPE_WIDTH);
 
@@ -94,6 +167,7 @@ function App() {
             x: gameDimensions.width,
             height: pipeHeight,
             passed: false,
+            speed: pipeSpeed,
           });
         }
 
@@ -127,7 +201,7 @@ function App() {
     }, 20);
 
     return () => clearInterval(gameLoop);
-  }, [gameStarted, velocity, gameDimensions]);
+  }, [gameStarted, velocity, gameDimensions, pipeSpeed]);
 
   useEffect(() => {
     if (!gameStarted) return;
@@ -140,6 +214,7 @@ function App() {
       ) {
         pipe.passed = true;
         setScore((prev) => prev + 1);
+        playScoreSound();
       }
 
       // Collision detection
@@ -148,7 +223,7 @@ function App() {
         50 + BIRD_WIDTH > pipe.x &&
         (birdPosition < pipe.height || birdPosition + BIRD_HEIGHT > pipe.height + PIPE_GAP)
       ) {
-        setGameOver(true);
+        loseLife();
       }
     });
   }, [pipes, birdPosition, gameStarted]);
@@ -158,7 +233,30 @@ function App() {
       <div className="game-container">
         <div className="game-header">
           <h1>Flappy Bird</h1>
-          <div className="score">Score: {score}</div>
+          <div className="game-stats">
+            <div className="score">Score: {score}</div>
+            <div className="lives">Lives: {'❤️'.repeat(lives)}</div>
+            <div className="level">Level: {currentLevel}</div>
+          </div>
+          <div className="music-controls">
+            <button 
+              className={`music-toggle ${musicPlaying ? 'playing' : ''}`}
+              onClick={() => setMusicPlaying(!musicPlaying)}
+              title={musicPlaying ? 'Pause Music' : 'Play Music'}
+            >
+              {musicPlaying ? '🔊' : '🔇'}
+            </button>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.1"
+              value={volume}
+              onChange={(e) => setVolume(parseFloat(e.target.value))}
+              className="volume-slider"
+              title="Volume"
+            />
+          </div>
         </div>
         
         <div 
@@ -224,6 +322,7 @@ function App() {
             <div className="game-over">
               <h2>Game Over!</h2>
               <p>Final Score: {score}</p>
+              <p>Level Reached: {currentLevel}</p>
               <button onClick={resetGame}>Play Again</button>
             </div>
           )}
@@ -231,6 +330,8 @@ function App() {
           {!gameStarted && !gameOver && (
             <div className="start-screen">
               <h2>Click or Press Space to Start</h2>
+              <p>You have 3 lives!</p>
+              <p>Difficulty increases every 10 seconds</p>
             </div>
           )}
         </div>
@@ -238,6 +339,7 @@ function App() {
         <div className="instructions">
           <p>Click or press Space to make the bird jump</p>
           <p>Avoid the pipes and try to get the highest score!</p>
+          <p>Speed increases every 10 seconds - stay alive as long as possible!</p>
         </div>
       </div>
     </div>
