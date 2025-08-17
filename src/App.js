@@ -203,7 +203,10 @@ function App() {
       setBirdPosition((prev) => {
         const newPosition = prev + velocity;
         if (newPosition < 0 || newPosition > gameDimensions.height - BIRD_HEIGHT) {
-          loseLife();
+          // Only lose life if bird has lives and game isn't over
+          if (lives > 0 && !gameOver) {
+            loseLife();
+          }
           return prev;
         }
         return newPosition;
@@ -219,7 +222,7 @@ function App() {
           }))
           .filter((pipe) => pipe.x > -PIPE_WIDTH);
 
-        if (prevPipes.length === 0 || prevPipes[prevPipes.length - 1].x < gameDimensions.width - 300) {
+        if ((prevPipes.length === 0 || prevPipes[prevPipes.length - 1].x < gameDimensions.width - 300) && !gameOver) {
           const currentGap = Math.max(MIN_PIPE_GAP, INITIAL_PIPE_GAP - (GAP_DECREASE_RATE * Math.floor(score / 5)));
           const pipeHeight = Math.random() * (gameDimensions.height - currentGap - 100) + 50;
           newPipes.push({
@@ -243,7 +246,7 @@ function App() {
           }))
           .filter((cloud) => cloud.x > -100);
 
-        if (prevClouds.length === 0 || Math.random() < 0.008) {
+        if ((prevClouds.length === 0 || Math.random() < 0.008) && !gameOver) {
           const cloudY = Math.random() * (gameDimensions.height - 100) + 50;
           const cloudSize = Math.random() * 40 + 60;
           const cloudSpeed = Math.random() * 0.5 + 0.5;
@@ -261,7 +264,7 @@ function App() {
     }, 20);
 
     return () => clearInterval(gameLoop);
-  }, [gameStarted, velocity, gameDimensions]);
+  }, [gameStarted, velocity, gameDimensions, gameOver]);
 
   useEffect(() => {
     if (!gameStarted) return;
@@ -273,20 +276,25 @@ function App() {
         pipe.x + PIPE_WIDTH > 50
       ) {
         pipe.passed = true;
-        setScore((prev) => prev + 1);
-        playScoreSound();
+        // Only increase score if game is not over and bird has lives
+        if (!gameOver && lives > 0) {
+          setScore((prev) => prev + 1);
+          playScoreSound();
+        }
       }
 
-      // Collision detection
-      if (
-        50 < pipe.x + PIPE_WIDTH &&
-        50 + BIRD_WIDTH > pipe.x &&
-        (birdPosition < pipe.height || birdPosition + BIRD_HEIGHT > pipe.height + pipe.gap)
-      ) {
-        loseLife();
+      // Collision detection - only check if bird has lives
+      if (lives > 0 && !gameOver) {
+        if (
+          50 < pipe.x + PIPE_WIDTH &&
+          50 + BIRD_WIDTH > pipe.x &&
+          (birdPosition < pipe.height || birdPosition + BIRD_HEIGHT > pipe.height + pipe.gap)
+        ) {
+          loseLife();
+        }
       }
     });
-  }, [pipes, birdPosition, gameStarted]);
+  }, [pipes, birdPosition, gameStarted, gameOver, lives]);
 
   return (
     <div className="App">
