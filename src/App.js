@@ -328,7 +328,6 @@ function App() {
           <div className="game-stats">
             <div className="score">Score: {score}</div>
             <div className="lives">Lives: {'❤️'.repeat(lives)}</div>
-            <div className="difficulty">Gap: {Math.max(MIN_PIPE_GAP, INITIAL_PIPE_GAP - (GAP_DECREASE_RATE * Math.floor(score / 5)))}px</div>
           </div>
           <div className="music-controls">
             <button
