@@ -27,6 +27,7 @@ function App() {
   const [musicPlaying, setMusicPlaying] = useState(false);
   const [volume, setVolume] = useState(0.5);
   const [audioEnabled, setAudioEnabled] = useState(false);
+  const [audioLoaded, setAudioLoaded] = useState(false);
 
   // Enable audio on first user interaction
   const enableAudio = () => {
@@ -58,8 +59,31 @@ function App() {
       audio.loop = true;
       audio.volume = volume;
       
+      // Preload the audio for better performance
+      audio.preload = 'auto';
+      
+      // Track when audio is loaded
+      audio.addEventListener('canplaythrough', () => {
+        setAudioLoaded(true);
+        console.log('Audio file loaded successfully');
+      });
+      
+      audio.addEventListener('error', (e) => {
+        console.log('Audio loading error:', e);
+        setAudioLoaded(false);
+      });
+      
       if (musicPlaying) {
-        audio.play().catch(e => console.log('Audio play failed:', e));
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(e => {
+            console.log('Audio play failed:', e);
+            // Common issue: browser requires user interaction
+            if (e.name === 'NotAllowedError') {
+              console.log('Browser requires user interaction before playing audio');
+            }
+          });
+        }
       }
 
       return () => {
@@ -307,13 +331,14 @@ function App() {
             <div className="difficulty">Gap: {Math.max(MIN_PIPE_GAP, INITIAL_PIPE_GAP - (GAP_DECREASE_RATE * Math.floor(score / 5)))}px</div>
           </div>
           <div className="music-controls">
-            <button 
-              className={`music-toggle ${musicPlaying ? 'playing' : ''}`}
-              onClick={toggleMusic}
-              title={musicPlaying ? 'Pause Music' : 'Play Music'}
-            >
-              {musicPlaying ? '🔊' : '🔇'}
-            </button>
+            <button
+                      className={`music-toggle ${musicPlaying ? 'playing' : ''} ${!audioLoaded ? 'loading' : ''}`}
+                      onClick={toggleMusic}
+                      title={!audioLoaded ? 'Loading music...' : musicPlaying ? 'Pause Music' : 'Play Music'}
+                      disabled={!audioLoaded}
+                    >
+                      {!audioLoaded ? '⏳' : musicPlaying ? '🔊' : '🔇'}
+                    </button>
             <input
               type="range"
               min="0"
