@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/Flappy-Bird/static/css/main.d70761d8.css",
-    "main.js": "/Flappy-Bird/static/js/main.b8f4a1d1.js",
+    "main.css": "/Flappy-Bird/static/css/main.cfed4925.css",
+    "main.js": "/Flappy-Bird/static/js/main.58b3462d.js",
     "static/js/453.9262c6d2.chunk.js": "/Flappy-Bird/static/js/453.9262c6d2.chunk.js",
     "index.html": "/Flappy-Bird/index.html",
-    "main.d70761d8.css.map": "/Flappy-Bird/static/css/main.d70761d8.css.map",
-    "main.b8f4a1d1.js.map": "/Flappy-Bird/static/js/main.b8f4a1d1.js.map",
+    "main.cfed4925.css.map": "/Flappy-Bird/static/css/main.cfed4925.css.map",
+    "main.58b3462d.js.map": "/Flappy-Bird/static/js/main.58b3462d.js.map",
     "453.9262c6d2.chunk.js.map": "/Flappy-Bird/static/js/453.9262c6d2.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.d70761d8.css",
-    "static/js/main.b8f4a1d1.js"
+    "static/css/main.cfed4925.css",
+    "static/js/main.58b3462d.js"
   ]
 }
