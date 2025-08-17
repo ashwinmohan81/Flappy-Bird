@@ -1,70 +1,61 @@
-# Getting Started with Create React App
+# Flappy Bird Game
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A simple Flappy Bird game built with React using modern hooks and game mechanics.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **Simple Controls**: Click or press Space to make the bird jump
+- **Procedural Pipes**: Randomly generated pipes with consistent gaps
+- **Score Tracking**: Real-time score display and final score on game over
+- **Responsive Design**: Works on both desktop and mobile devices
+- **Smooth Gameplay**: 60 FPS game loop with proper collision detection
 
-### `npm start`
+## How to Play
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+1. **Start**: Click anywhere in the game area or press Space to begin
+2. **Control**: Click or press Space to make the bird flap upward
+3. **Objective**: Navigate through the pipes without hitting them
+4. **Scoring**: Each pipe you pass gives you 1 point
+5. **Game Over**: Hit a pipe or go out of bounds to end the game
+6. **Restart**: Click "Play Again" to start a new game
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Technical Implementation
 
-### `npm test`
+- **React Hooks**: Uses `useState`, `useEffect`, and `useCallback` for state management
+- **Game Loop**: 20ms interval for smooth 50 FPS gameplay
+- **Physics**: Simple gravity and velocity system
+- **Collision Detection**: Precise hitbox calculations for pipes and bird
+- **Responsive Design**: CSS Grid and Flexbox for cross-device compatibility
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Getting Started
 
-### `npm run build`
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+2. Start the development server:
+   ```bash
+   npm start
+   ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+3. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+4. Enjoy the game!
 
-### `npm run eject`
+## Game Constants
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+- Bird size: 38x28 pixels
+- Game area: 500x500 pixels
+- Pipe width: 52 pixels
+- Pipe gap: 150 pixels
+- Gravity: 0.5 pixels/frame²
+- Jump speed: -8 pixels/frame
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Future Enhancements
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Sound effects and background music
+- High score persistence
+- Different bird skins
+- Power-ups and obstacles
+- Multiplayer support
