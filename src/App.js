@@ -54,50 +54,18 @@ function App() {
     let audio;
     
     try {
-      // Create audio context for better compatibility
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      const audioContext = new AudioContext();
-      
-      // Create oscillator for background music (8-bit style)
-      const createBackgroundMusic = () => {
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.type = 'square';
-        oscillator.frequency.setValueAtTime(220, audioContext.currentTime); // A3 note
-        oscillator.frequency.setValueAtTime(330, audioContext.currentTime + 0.5); // E4 note
-        oscillator.frequency.setValueAtTime(440, audioContext.currentTime + 1.0); // A4 note
-        
-        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(volume * 0.3, audioContext.currentTime + 0.1);
-        
-        return { oscillator, gainNode, audioContext };
-      };
+      audio = new Audio('/8-bit-dreamland.mp3');
+      audio.loop = true;
+      audio.volume = volume;
       
       if (musicPlaying) {
-        audio = createBackgroundMusic();
-        audio.oscillator.start();
-        
-        // Loop the music
-        const loopMusic = () => {
-          if (musicPlaying) {
-            audio.oscillator.frequency.setValueAtTime(220, audioContext.currentTime);
-            audio.oscillator.frequency.setValueAtTime(330, audioContext.currentTime + 0.5);
-            audio.oscillator.frequency.setValueAtTime(440, audioContext.currentTime + 1.0);
-            setTimeout(loopMusic, 1500);
-          }
-        };
-        
-        loopMusic();
+        audio.play().catch(e => console.log('Audio play failed:', e));
       }
 
       return () => {
         if (audio) {
-          audio.oscillator.stop();
-          audio.audioContext.close();
+          audio.pause();
+          audio.currentTime = 0;
         }
       };
     } catch (error) {
