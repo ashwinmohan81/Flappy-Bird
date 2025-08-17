@@ -2,7 +2,7 @@
   "name": "flappy-bird",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://ashwinmohan.github.io/flappy-bird",
+  "homepage": "https://ashwinmohan81.github.io/flappy-bird",
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.7.0",
