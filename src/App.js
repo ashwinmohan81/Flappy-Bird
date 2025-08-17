@@ -17,6 +17,7 @@ function App() {
   const [pipes, setPipes] = useState([]);
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
+  const [clouds, setClouds] = useState([]);
 
   const jump = useCallback(() => {
     if (!gameStarted) {
@@ -34,6 +35,7 @@ function App() {
     setPipes([]);
     setScore(0);
     setGameOver(false);
+    setClouds([]);
   };
 
   useEffect(() => {
@@ -82,6 +84,31 @@ function App() {
 
         return newPipes;
       });
+
+      // Cloud generation and movement
+      setClouds((prevClouds) => {
+        const newClouds = prevClouds
+          .map((cloud) => ({
+            ...cloud,
+            x: cloud.x - cloud.speed,
+          }))
+          .filter((cloud) => cloud.x > -100);
+
+        if (prevClouds.length === 0 || Math.random() < 0.02) {
+          const cloudY = Math.random() * (GAME_HEIGHT - 100) + 50;
+          const cloudSize = Math.random() * 40 + 60;
+          const cloudSpeed = Math.random() * 0.5 + 0.5;
+          newClouds.push({
+            x: GAME_WIDTH + 50,
+            y: cloudY,
+            size: cloudSize,
+            speed: cloudSpeed,
+            opacity: Math.random() * 0.3 + 0.7,
+          });
+        }
+
+        return newClouds;
+      });
     }, 20);
 
     return () => clearInterval(gameLoop);
@@ -124,6 +151,21 @@ function App() {
           onClick={jump}
           style={{ width: GAME_WIDTH, height: GAME_HEIGHT }}
         >
+          {/* Clouds in background */}
+          {clouds.map((cloud, index) => (
+            <div
+              key={`cloud-${index}`}
+              className="cloud"
+              style={{
+                left: cloud.x,
+                top: cloud.y,
+                width: cloud.size,
+                height: cloud.size * 0.6,
+                opacity: cloud.opacity,
+              }}
+            />
+          ))}
+          
           <div
             className="bird"
             style={{

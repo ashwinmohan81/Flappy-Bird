@@ -118,6 +118,48 @@
   border-bottom: 3px solid transparent;
 }
 
+/* Bird rotation based on velocity */
+.bird.flying {
+  transform: rotate(-15deg);
+}
+
+.bird.falling {
+  transform: rotate(15deg);
+}
+
+/* Clouds */
+.cloud {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50px;
+  z-index: 1;
+  box-shadow: 
+    inset 0 0 20px rgba(255, 255, 255, 0.8),
+    0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.cloud::before,
+.cloud::after {
+  content: '';
+  position: absolute;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50px;
+}
+
+.cloud::before {
+  width: 60%;
+  height: 60%;
+  top: -20%;
+  left: 20%;
+}
+
+.cloud::after {
+  width: 50%;
+  height: 50%;
+  top: 10%;
+  right: 10%;
+}
+
 .pipe {
   position: absolute;
   background: linear-gradient(90deg, #696969, #A9A9A9, #696969);
