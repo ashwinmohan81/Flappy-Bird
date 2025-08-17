@@ -3,13 +3,13 @@ import './App.css';
 
 const BIRD_HEIGHT = 28;
 const BIRD_WIDTH = 38;
-const PIPE_WIDTH = 52;
-const PIPE_GAP = 150;
 const GRAVITY = 0.5;
 const JUMP_SPEED = -8;
-const INITIAL_PIPE_SPEED = 2;
-const MAX_PIPE_SPEED = 6;
-const DIFFICULTY_INCREASE_INTERVAL = 10000; // 10 seconds
+const PIPE_WIDTH = 52;
+const INITIAL_PIPE_GAP = 150;
+const MIN_PIPE_GAP = 80;
+const PIPE_SPEED = 2;
+const GAP_DECREASE_RATE = 2; // Decrease gap by 2px every 5 pipes
 
 function App() {
   const [birdPosition, setBirdPosition] = useState(250);
@@ -20,8 +20,6 @@ function App() {
   const [gameOver, setGameOver] = useState(false);
   const [clouds, setClouds] = useState([]);
   const [lives, setLives] = useState(3);
-  const [currentLevel, setCurrentLevel] = useState(1);
-  const [pipeSpeed, setPipeSpeed] = useState(INITIAL_PIPE_SPEED);
   const [gameDimensions, setGameDimensions] = useState({
     width: window.innerWidth,
     height: window.innerHeight
@@ -182,18 +180,6 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Progressive difficulty system
-  useEffect(() => {
-    if (!gameStarted || gameOver) return;
-
-    const difficultyTimer = setInterval(() => {
-      setCurrentLevel(prev => prev + 1);
-      setPipeSpeed(prev => Math.min(prev + 0.5, MAX_PIPE_SPEED));
-    }, DIFFICULTY_INCREASE_INTERVAL);
-
-    return () => clearInterval(difficultyTimer);
-  }, [gameStarted, gameOver]);
-
   const jump = useCallback(() => {
     enableAudio();
     if (!gameStarted) {
@@ -214,8 +200,6 @@ function App() {
     setGameOver(false);
     setClouds([]);
     setLives(3);
-    setCurrentLevel(1);
-    setPipeSpeed(INITIAL_PIPE_SPEED);
   };
 
   const loseLife = () => {
@@ -265,17 +249,19 @@ function App() {
         const newPipes = prevPipes
           .map((pipe) => ({
             ...pipe,
-            x: pipe.x - pipeSpeed,
+            x: pipe.x - PIPE_SPEED,
           }))
           .filter((pipe) => pipe.x > -PIPE_WIDTH);
 
         if (prevPipes.length === 0 || prevPipes[prevPipes.length - 1].x < gameDimensions.width - 200) {
-          const pipeHeight = Math.random() * (gameDimensions.height - PIPE_GAP - 100) + 50;
+          const currentGap = Math.max(MIN_PIPE_GAP, INITIAL_PIPE_GAP - (GAP_DECREASE_RATE * Math.floor(score / 5)));
+          const pipeHeight = Math.random() * (gameDimensions.height - currentGap - 100) + 50;
           newPipes.push({
             x: gameDimensions.width,
             height: pipeHeight,
             passed: false,
-            speed: pipeSpeed,
+            speed: PIPE_SPEED,
+            gap: currentGap,
           });
         }
 
@@ -309,7 +295,7 @@ function App() {
     }, 20);
 
     return () => clearInterval(gameLoop);
-  }, [gameStarted, velocity, gameDimensions, pipeSpeed]);
+  }, [gameStarted, velocity, gameDimensions]);
 
   useEffect(() => {
     if (!gameStarted) return;
@@ -329,7 +315,7 @@ function App() {
       if (
         50 < pipe.x + PIPE_WIDTH &&
         50 + BIRD_WIDTH > pipe.x &&
-        (birdPosition < pipe.height || birdPosition + BIRD_HEIGHT > pipe.height + PIPE_GAP)
+        (birdPosition < pipe.height || birdPosition + BIRD_HEIGHT > pipe.height + pipe.gap)
       ) {
         loseLife();
       }
@@ -344,7 +330,7 @@ function App() {
           <div className="game-stats">
             <div className="score">Score: {score}</div>
             <div className="lives">Lives: {'❤️'.repeat(lives)}</div>
-            <div className="level">Level: {currentLevel}</div>
+            <div className="difficulty">Gap: {Math.max(MIN_PIPE_GAP, INITIAL_PIPE_GAP - (GAP_DECREASE_RATE * Math.floor(score / 5)))}px</div>
           </div>
           <div className="music-controls">
             <button 
@@ -418,9 +404,9 @@ function App() {
                 className="pipe bottom-pipe"
                 style={{
                   left: pipe.x,
-                  top: pipe.height + PIPE_GAP,
+                  top: pipe.height + pipe.gap,
                   width: PIPE_WIDTH,
-                  height: gameDimensions.height - pipe.height - PIPE_GAP - 100,
+                  height: gameDimensions.height - pipe.height - pipe.gap - 100,
                 }}
               />
             </React.Fragment>
@@ -430,7 +416,6 @@ function App() {
             <div className="game-over">
               <h2>Game Over!</h2>
               <p>Final Score: {score}</p>
-              <p>Level Reached: {currentLevel}</p>
               <button onClick={resetGame}>Play Again</button>
             </div>
           )}
@@ -439,7 +424,6 @@ function App() {
             <div className="start-screen">
               <h2>Click or Press Space to Start</h2>
               <p>You have 3 lives!</p>
-              <p>Difficulty increases every 10 seconds</p>
             </div>
           )}
         </div>
@@ -447,7 +431,7 @@ function App() {
         <div className="instructions">
           <p>Click or press Space to make the bird jump</p>
           <p>Avoid the pipes and try to get the highest score!</p>
-          <p>Speed increases every 10 seconds - stay alive as long as possible!</p>
+          <p>Gap between pipes decreases every 5 points - making it harder!</p>
         </div>
       </div>
     </div>

@@ -67,6 +67,11 @@
   border: 2px solid rgba(255, 215, 0, 0.5);
 }
 
+.difficulty {
+  background: rgba(255, 165, 0, 0.3);
+  border: 2px solid rgba(255, 165, 0, 0.5);
+}
+
 .music-controls {
   display: flex;
   align-items: center;
