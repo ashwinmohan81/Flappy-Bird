@@ -132,7 +132,11 @@ function App() {
               width: BIRD_WIDTH,
               height: BIRD_HEIGHT,
             }}
-          />
+          >
+            <div className="eye"></div>
+            <div className="beak"></div>
+            <div className="tail"></div>
+          </div>
           
           {pipes.map((pipe, index) => (
             <React.Fragment key={index}>

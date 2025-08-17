@@ -49,50 +49,118 @@
 
 .bird {
   position: absolute;
-  background: #FFD700;
-  border-radius: 50%;
-  border: 3px solid #FF8C00;
+  width: 38px;
+  height: 28px;
   z-index: 10;
   transition: transform 0.1s ease;
 }
 
+/* Bird body */
 .bird::before {
   content: '';
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #FFD700;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  border: 2px solid #DAA520;
+}
+
+/* Bird wing */
+.bird::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 5px;
+  width: 20px;
+  height: 12px;
+  background: #FFA500;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  transform: rotate(-15deg);
+  border: 1px solid #DAA520;
+}
+
+/* Bird eye */
+.bird .eye {
+  position: absolute;
+  top: 6px;
+  right: 8px;
   width: 8px;
   height: 8px;
   background: #000;
   border-radius: 50%;
+  border: 1px solid #FFF;
 }
 
-.bird::after {
-  content: '';
+/* Bird beak */
+.bird .beak {
+  position: absolute;
+  bottom: 10px;
+  right: -2px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid #FF4500;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+}
+
+/* Bird tail */
+.bird .tail {
   position: absolute;
   bottom: 8px;
-  right: 12px;
-  width: 12px;
-  height: 6px;
-  background: #FF4500;
-  border-radius: 3px;
+  left: -3px;
+  width: 0;
+  height: 0;
+  border-right: 6px solid #FFA500;
+  border-top: 3px solid transparent;
+  border-bottom: 3px solid transparent;
 }
 
 .pipe {
   position: absolute;
-  background: linear-gradient(to bottom, #228B22, #32CD32);
-  border: 2px solid #006400;
-  border-radius: 5px;
+  background: linear-gradient(90deg, #696969, #A9A9A9, #696969);
+  border: 3px solid #2F4F4F;
+  box-shadow: 
+    inset 0 0 10px rgba(0, 0, 0, 0.3),
+    0 0 5px rgba(0, 0, 0, 0.2);
 }
 
 .top-pipe {
   border-bottom: none;
-  border-radius: 5px 5px 0 0;
+  border-radius: 8px 8px 0 0;
+}
+
+.top-pipe::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -3px;
+  right: -3px;
+  height: 15px;
+  background: linear-gradient(90deg, #2F4F4F, #696969, #2F4F4F);
+  border-radius: 8px 8px 0 0;
+  border: 3px solid #2F4F4F;
+  border-bottom: none;
 }
 
 .bottom-pipe {
   border-top: none;
-  border-radius: 0 0 5px 5px;
+  border-radius: 0 0 8px 8px;
+}
+
+.bottom-pipe::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -3px;
+  right: -3px;
+  height: 15px;
+  background: linear-gradient(90deg, #2F4F4F, #696969, #2F4F4F);
+  border-radius: 0 0 8px 8px;
+  border: 3px solid #2F4F4F;
+  border-top: none;
 }
 
 .game-over, .start-screen {
