@@ -55,7 +55,7 @@ function App() {
     let audio;
     
     try {
-      audio = new Audio('/8-bit-dreamland.mp3');
+      audio = new Audio('8-bit-dreamland.mp3');
       audio.loop = true;
       audio.volume = volume;
       
@@ -70,7 +70,18 @@ function App() {
       
       audio.addEventListener('error', (e) => {
         console.log('Audio loading error:', e);
+        console.log('Audio error details:', audio.error);
+        console.log('Audio src:', audio.src);
         setAudioLoaded(false);
+      });
+      
+      // Add load event listener
+      audio.addEventListener('loadstart', () => {
+        console.log('Audio loading started');
+      });
+      
+      audio.addEventListener('loadeddata', () => {
+        console.log('Audio data loaded');
       });
       
       if (musicPlaying) {
