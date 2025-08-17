@@ -28,37 +28,144 @@ function App() {
   });
   const [musicPlaying, setMusicPlaying] = useState(false);
   const [volume, setVolume] = useState(0.5);
+  const [audioEnabled, setAudioEnabled] = useState(false);
+
+  // Enable audio on first user interaction
+  const enableAudio = () => {
+    if (!audioEnabled) {
+      setAudioEnabled(true);
+      // Try to start audio context
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioContext = new AudioContext();
+        audioContext.resume();
+        audioContext.close();
+      } catch (error) {
+        console.log('Audio context setup failed:', error);
+      }
+    }
+  };
+
+  const toggleMusic = () => {
+    enableAudio();
+    setMusicPlaying(!musicPlaying);
+  };
 
   // Audio setup
   useEffect(() => {
-    const audio = new Audio('/8-bit-dreamland.mp3');
-    audio.loop = true;
-    audio.volume = volume;
+    let audio;
     
-    if (musicPlaying) {
-      audio.play().catch(e => console.log('Audio play failed:', e));
-    }
+    try {
+      // Create audio context for better compatibility
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      const audioContext = new AudioContext();
+      
+      // Create oscillator for background music (8-bit style)
+      const createBackgroundMusic = () => {
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.type = 'square';
+        oscillator.frequency.setValueAtTime(220, audioContext.currentTime); // A3 note
+        oscillator.frequency.setValueAtTime(330, audioContext.currentTime + 0.5); // E4 note
+        oscillator.frequency.setValueAtTime(440, audioContext.currentTime + 1.0); // A4 note
+        
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(volume * 0.3, audioContext.currentTime + 0.1);
+        
+        return { oscillator, gainNode, audioContext };
+      };
+      
+      if (musicPlaying) {
+        audio = createBackgroundMusic();
+        audio.oscillator.start();
+        
+        // Loop the music
+        const loopMusic = () => {
+          if (musicPlaying) {
+            audio.oscillator.frequency.setValueAtTime(220, audioContext.currentTime);
+            audio.oscillator.frequency.setValueAtTime(330, audioContext.currentTime + 0.5);
+            audio.oscillator.frequency.setValueAtTime(440, audioContext.currentTime + 1.0);
+            setTimeout(loopMusic, 1500);
+          }
+        };
+        
+        loopMusic();
+      }
 
-    return () => {
-      audio.pause();
-      audio.currentTime = 0;
-    };
+      return () => {
+        if (audio) {
+          audio.oscillator.stop();
+          audio.audioContext.close();
+        }
+      };
+    } catch (error) {
+      console.log('Audio setup failed:', error);
+    }
   }, [musicPlaying, volume]);
 
   // Sound effects
   const playJumpSound = () => {
     if (volume > 0) {
-      const jumpAudio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT');
-      jumpAudio.volume = volume * 0.7;
-      jumpAudio.play().catch(e => console.log('Jump sound failed:', e));
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioContext = new AudioContext();
+        
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.1);
+        
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(volume * 0.4, audioContext.currentTime + 0.01);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+        
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.1);
+        
+        setTimeout(() => audioContext.close(), 200);
+      } catch (error) {
+        console.log('Jump sound failed:', error);
+      }
     }
   };
 
   const playScoreSound = () => {
     if (volume > 0) {
-      const scoreAudio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT');
-      scoreAudio.volume = volume * 0.6;
-      scoreAudio.play().catch(e => console.log('Score sound failed:', e));
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioContext = new AudioContext();
+        
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.type = 'square';
+        oscillator.frequency.setValueAtTime(523, audioContext.currentTime); // C5
+        oscillator.frequency.setValueAtTime(659, audioContext.currentTime + 0.1); // E5
+        oscillator.frequency.setValueAtTime(784, audioContext.currentTime + 0.2); // G5
+        
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(volume * 0.3, audioContext.currentTime + 0.01);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+        
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.3);
+        
+        setTimeout(() => audioContext.close(), 400);
+      } catch (error) {
+        console.log('Score sound failed:', error);
+      }
     }
   };
 
@@ -88,6 +195,7 @@ function App() {
   }, [gameStarted, gameOver]);
 
   const jump = useCallback(() => {
+    enableAudio();
     if (!gameStarted) {
       setGameStarted(true);
     }
@@ -241,7 +349,7 @@ function App() {
           <div className="music-controls">
             <button 
               className={`music-toggle ${musicPlaying ? 'playing' : ''}`}
-              onClick={() => setMusicPlaying(!musicPlaying)}
+              onClick={toggleMusic}
               title={musicPlaying ? 'Pause Music' : 'Play Music'}
             >
               {musicPlaying ? '🔊' : '🔇'}
