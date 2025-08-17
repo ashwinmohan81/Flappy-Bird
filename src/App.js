@@ -246,7 +246,7 @@ function App() {
           }))
           .filter((pipe) => pipe.x > -PIPE_WIDTH);
 
-        if ((prevPipes.length === 0 || prevPipes[prevPipes.length - 1].x < gameDimensions.width - 300) && !gameOver) {
+        if ((prevPipes.length === 0 || prevPipes[prevPipes.length - 1].x < gameDimensions.width - 150) && !gameOver) {
           const currentGap = Math.max(MIN_PIPE_GAP, INITIAL_PIPE_GAP - (GAP_DECREASE_RATE * Math.floor(score / 5)));
           const pipeHeight = Math.random() * (gameDimensions.height - currentGap - 100) + 50;
           newPipes.push({
