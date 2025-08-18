@@ -6,10 +6,10 @@ const BIRD_WIDTH = 38;
 const GRAVITY = 0.5;
 const JUMP_SPEED = -8;
 const PIPE_WIDTH = 52;
-const INITIAL_PIPE_GAP = 150;
+const INITIAL_PIPE_GAP = 200;
 const MIN_PIPE_GAP = 80;
 const PIPE_SPEED = 2;
-const GAP_DECREASE_RATE = 2; // Decrease gap by 2px every 5 pipes
+const GAP_DECREASE_RATE = 3; // Decrease gap by 3px every 3 pipes
 
 function App() {
   const [birdPosition, setBirdPosition] = useState(250);
@@ -257,8 +257,8 @@ function App() {
           }))
           .filter((pipe) => pipe.x > -PIPE_WIDTH);
 
-        if ((prevPipes.length === 0 || prevPipes[prevPipes.length - 1].x < gameDimensions.width - 150) && !gameOver) {
-          const currentGap = Math.max(MIN_PIPE_GAP, INITIAL_PIPE_GAP - (GAP_DECREASE_RATE * Math.floor(score / 5)));
+        if ((prevPipes.length === 0 || prevPipes[prevPipes.length - 1].x < gameDimensions.width - 300) && !gameOver) {
+          const currentGap = Math.max(MIN_PIPE_GAP, INITIAL_PIPE_GAP - (GAP_DECREASE_RATE * Math.floor(score / 3)));
           const pipeHeight = Math.random() * (gameDimensions.height - currentGap - 100) + 50;
           newPipes.push({
             x: gameDimensions.width,
@@ -440,7 +440,7 @@ function App() {
         <div className="instructions">
           <p>Click or press Space to make the bird jump</p>
           <p>Avoid the pipes and try to get the highest score!</p>
-          <p>Gap between pipes decreases every 5 points - making it harder!</p>
+          <p>Gap between pipes decreases every 3 points - making it harder!</p>
         </div>
       </div>
     </div>
